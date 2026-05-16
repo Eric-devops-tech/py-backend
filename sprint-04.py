@@ -406,3 +406,119 @@ def excluir_dentista():
         print(f"\n✅ Dentista '{nome}' excluído com sucesso.\n")
     else:
         print(" Exclusão cancelada.\n")
+
+# FUNCIONALIDADES DE MATCH E CONSULTAS
+
+def match_paciente_dentista():
+    """Realiza o match entre paciente e dentista."""
+    print("\n Match Paciente ↔ Dentista ")
+    if not pacientes or not dentistas:
+        print("Cadastre pelo menos um paciente e um dentista primeiro.\n")
+        return
+
+    listar_pacientes()
+    while True:
+        escolha = obter_inteiro("Escolha o número do paciente: ") - 1
+        if 0 <= escolha < len(pacientes):
+            break
+        print(" Número de paciente inválido. Tente novamente.")
+
+    paciente = pacientes[escolha]
+    melhor_dentista, maior_pontuacao = encontrar_melhor_dentista(paciente)
+
+    if melhor_dentista and maior_pontuacao > 0:
+        melhor_dentista["atendidos"] += 1
+        salvar_dados()
+        print(f"\n Paciente '{paciente['nome']}' (Urgência: {paciente['urgencia']}) "
+              f"combinado com '{melhor_dentista['nome']}' (Pontuação: {maior_pontuacao}).\n")
+    else:
+        print("⚠️ Nenhum dentista disponível e compatível no momento.\n")
+
+
+def agendar_consulta(data_padrao="", hora_padrao=""):  # ← valores padrão
+    """Agendamento de consulta com match automático."""
+    print("\n Agendar Consulta ")
+    if not pacientes:
+        print("Cadastre um paciente primeiro.\n")
+        return
+
+    listar_pacientes()
+    while True:
+        escolha = obter_inteiro("Número do paciente para agendar (0 para cancelar): ") - 1
+        if escolha == -1:
+            return
+        if 0 <= escolha < len(pacientes):
+            break
+        print(" Número inválido. Tente novamente.")
+
+    paciente = pacientes[escolha]
+    data = input(f"Data da consulta (DD/MM/AAAA) [{data_padrao or 'obrigatório'}]: ").strip() or data_padrao
+    hora = input(f"Hora da consulta (HH:MM) [{hora_padrao or 'obrigatório'}]: ").strip() or hora_padrao
+
+    dentista_nome_input = input("Nome do dentista (ou Enter para Match automático): ").strip()
+
+    if not dentista_nome_input:
+        print("Iniciando Match automático...")
+        if not dentistas:
+            print("⚠️ Nenhum dentista cadastrado.")
+            dentista_final = "Aguardando Dentista"
+        else:
+            melhor_dentista, pontuacao = encontrar_melhor_dentista(paciente)
+            if melhor_dentista and pontuacao > 0:
+                melhor_dentista["atendidos"] += 1
+                dentista_final = melhor_dentista["nome"]
+                print(f"✅ Match realizado! Dentista: {dentista_final} (Pontuação: {pontuacao}).")
+            else:
+                dentista_final = "Aguardando Match"
+                print("⚠️ Nenhum dentista compatível encontrado.")
+    else:
+        dentista_final = dentista_nome_input
+
+    consulta = {
+        "paciente": paciente["nome"],
+        "data": data,
+        "hora": hora,
+        "dentista": dentista_final
+    }
+    consultas_agendadas.append(consulta)
+    salvar_dados()
+    print(f"\n✅ Consulta agendada para '{paciente['nome']}' em {data} às {hora}. Dentista: {dentista_final}.\n")
+
+
+def listar_consultas():
+    """Lista todas as consultas agendadas."""
+    print("\n--- 📄 Consultas Agendadas ---")
+    if not consultas_agendadas:
+        print("Nenhuma consulta agendada.\n")
+        return
+    for i, c in enumerate(consultas_agendadas):
+        print(f"[{i + 1}] Paciente: {c['paciente']}")
+        print(f"    Data/Hora: {c['data']} às {c['hora']}")
+        print(f"    Dentista: {c['dentista']}")
+        print("-" * 35)
+    print(f"Total: {len(consultas_agendadas)} consulta(s).\n")
+
+
+def excluir_consulta():
+    """Remove uma consulta agendada."""
+    print("\n Cancelar Consulta ")
+    if not consultas_agendadas:
+        print("Nenhuma consulta agendada.\n")
+        return
+    listar_consultas()
+    while True:
+        escolha = obter_inteiro("Número da consulta a cancelar (0 para voltar): ") - 1
+        if escolha == -1:
+            return
+        if 0 <= escolha < len(consultas_agendadas):
+            break
+        print(" Número inválido.")
+
+    c = consultas_agendadas[escolha]
+    confirmacao = input(f"Cancelar consulta de '{c['paciente']}' em {c['data']}? (s/n): ").strip().lower()
+    if confirmacao == "s":
+        consultas_agendadas.pop(escolha)
+        salvar_dados()
+        print(" Consulta cancelada com sucesso.\n")
+    else:
+        print(" Cancelamento abortado.\n")
