@@ -172,3 +172,128 @@ def listar_pacientes():
         print(f"    Dor: {p['tipo_dor']} há {p['tempo_dor']} dias | Urgência: {p['urgencia']}")
         print("-" * 35)
     print(f"Total: {len(pacientes)} paciente(s).\n")
+
+def consultar_paciente():
+    """Busca um paciente pelo nome."""
+    print("\n--- 🔍 Consultar Paciente ---")
+    if not pacientes:
+        print("Nenhum paciente cadastrado.\n")
+        return
+    termo = input("Digite o nome (ou parte do nome) do paciente: ").strip().lower()
+    resultados = [p for p in pacientes if termo in p["nome"].lower()]
+    if not resultados:
+        print("⚠️ Nenhum paciente encontrado com esse nome.\n")
+        return
+    print(f"\n{len(resultados)} resultado(s) encontrado(s):")
+    for p in resultados:
+        print(f"  • {p['nome']} | Idade: {p['idade']} | Bairro: {p['bairro']} | Urgência: {p['urgencia']}")
+    print()
+
+
+def editar_paciente():
+    """Edita os dados de um paciente existente."""
+    print("\n--- ✏ Editar Paciente ---")
+    if not pacientes:
+        print("Nenhum paciente cadastrado.\n")
+        return
+    listar_pacientes()
+    while True:
+        escolha = obter_inteiro("Número do paciente a editar (0 para cancelar): ") - 1
+        if escolha == -1:
+            return
+        if 0 <= escolha < len(pacientes):
+            break
+        print(" Número inválido. Tente novamente.")
+
+    p = pacientes[escolha]
+    print(f"\nEditando: {p['nome']} (pressione Enter para manter o valor atual)\n")
+
+    nome = input(f"Nome [{p['nome']}]: ").strip()
+    if nome:
+        p["nome"] = nome
+
+    entrada_idade = input(f"Idade [{p['idade']}]: ").strip()
+    if entrada_idade:
+        try:
+            p["idade"] = int(entrada_idade)
+        except ValueError:
+            print(" Idade inválida, mantendo valor anterior.")
+
+    print(f"Tipo de dor atual: {p['tipo_dor']}")
+    nova_dor = input("Novo tipo de dor (leve/forte/dente quebrado) ou Enter para manter: ").strip().lower()
+    if nova_dor in ["leve", "forte", "dente quebrado"]:
+        p["tipo_dor"] = nova_dor
+
+    entrada_tempo = input(f"Tempo de dor em dias [{p['tempo_dor']}]: ").strip()
+    if entrada_tempo:
+        try:
+            p["tempo_dor"] = int(entrada_tempo)
+        except ValueError:
+            print(" Valor inválido, mantendo anterior.")
+
+    entrada_renda = input(f"Renda [{p['renda']}]: ").strip().replace(',', '.')
+    if entrada_renda:
+        try:
+            p["renda"] = float(entrada_renda)
+        except ValueError:
+            print(" Valor inválido, mantendo anterior.")
+
+    bairro = input(f"Bairro [{p['bairro']}]: ").strip()
+    if bairro:
+        p["bairro"] = bairro
+
+    p["urgencia"] = calcular_urgencia(p["tipo_dor"], p["tempo_dor"], p["renda"], p["idade"])
+    salvar_dados()
+    print(f"\n Paciente '{p['nome']}' atualizado com sucesso. Nova urgência: {p['urgencia']}.\n")
+
+
+def excluir_paciente():
+    """Remove um paciente da lista."""
+    print("\n--- 🗑️ Excluir Paciente ---")
+    if not pacientes:
+        print("Nenhum paciente cadastrado.\n")
+        return
+    listar_pacientes()
+    while True:
+        escolha = obter_inteiro("Número do paciente a excluir (0 para cancelar): ") - 1
+        if escolha == -1:
+            return
+        if 0 <= escolha < len(pacientes):
+            break
+        print(" Número inválido. Tente novamente.")
+
+    nome = pacientes[escolha]["nome"]
+    confirmacao = input(f"Tem certeza que deseja excluir '{nome}'? (s/n): ").strip().lower()
+    if confirmacao == "s":
+        pacientes.pop(escolha)
+        salvar_dados()
+        print(f"\n Paciente '{nome}' excluído com sucesso.\n")
+    else:
+        print(" Exclusão cancelada.\n")
+
+# CRUD — DENTISTAS
+
+def cadastrar_dentista(nome="", especialidade="clínico geral", bairro="", max_pacientes=10):  # ← valores padrão
+    """Cadastra um novo dentista voluntário."""
+    print("\n Cadastrar Dentista ")
+    nome = input(f"Nome do dentista [{nome or 'obrigatório'}]: ").strip() or nome
+    if not nome:
+        print(" Nome não pode ser vazio.")
+        return
+
+    especialidade = obter_especialidade(
+        f"Especialidade (prótese/ortodontia/odontopediatria/clínico geral/cirurgia/endodontia) [{especialidade}]: "
+    )
+    bairro = input(f"Bairro/Cidade [{bairro or 'obrigatório'}]: ").strip() or bairro
+    max_pacientes = obter_inteiro(f"Número máximo de pacientes por mês [{max_pacientes}]: ")
+
+    dentista = {
+        "nome": nome,
+        "especialidade": especialidade,
+        "bairro": bairro,
+        "max_pacientes": max_pacientes,
+        "atendidos": 0
+    }
+    dentistas.append(dentista)
+    salvar_dados()
+    print(f"\nDentista '{nome}' cadastrado.\n")
