@@ -297,3 +297,112 @@ def cadastrar_dentista(nome="", especialidade="clínico geral", bairro="", max_p
     dentistas.append(dentista)
     salvar_dados()
     print(f"\nDentista '{nome}' cadastrado.\n")
+
+    def listar_dentistas():
+     """Lista todos os dentistas cadastrados."""
+    print("\n--- 🧑‍⚕️ Lista de Dentistas ---")
+    if not dentistas:
+        print("Nenhum dentista cadastrado.\n")
+        return
+    for i, d in enumerate(dentistas):
+        print(f"[{i + 1}] Nome: {d['nome']} | Especialidade: {d['especialidade']}")
+        print(f"    Bairro: {d['bairro']} | Atendidos: {d['atendidos']}/{d['max_pacientes']}")
+        print("-" * 35)
+    print(f"Total: {len(dentistas)} dentista(s).\n")
+
+
+def consultar_dentista():
+    """Busca um dentista pelo nome ou especialidade."""
+    print("\n--- 🔍 Consultar Dentista ---")
+    if not dentistas:
+        print("Nenhum dentista cadastrado.\n")
+        return
+    print("Buscar por:\n1. Nome\n2. Especialidade")
+    opcao = obter_inteiro("Escolha: ")
+    if opcao == 1:
+        termo = input("Digite o nome (ou parte): ").strip().lower()
+        resultados = [d for d in dentistas if termo in d["nome"].lower()]
+    elif opcao == 2:
+        termo = input("Digite a especialidade: ").strip().lower()
+        resultados = [d for d in dentistas if termo in d["especialidade"].lower()]
+    else:
+        print(" Opção inválida.\n")
+        return
+
+    if not resultados:
+        print(" Nenhum dentista encontrado.\n")
+        return
+    print(f"\n{len(resultados)} resultado(s):")
+    for d in resultados:
+        disponivel = d["max_pacientes"] - d["atendidos"]
+        print(f"  • {d['nome']} | {d['especialidade']} | {d['bairro']} | Vagas: {disponivel}")
+    print()
+
+
+def editar_dentista():
+    """Edita os dados de um dentista existente."""
+    print("\n---  Editar Dentista ---")
+    if not dentistas:
+        print("Nenhum dentista cadastrado.\n")
+        return
+    listar_dentistas()
+    while True:
+        escolha = obter_inteiro("Número do dentista a editar (0 para cancelar): ") - 1
+        if escolha == -1:
+            return
+        if 0 <= escolha < len(dentistas):
+            break
+        print(" Número inválido. Tente novamente.")
+
+    d = dentistas[escolha]
+    print(f"\nEditando: {d['nome']} (pressione Enter para manter o valor atual)\n")
+
+    nome = input(f"Nome [{d['nome']}]: ").strip()
+    if nome:
+        d["nome"] = nome
+
+    print(f"Especialidade atual: {d['especialidade']}")
+    nova_esp = input("Nova especialidade ou Enter para manter: ").strip().lower()
+    if nova_esp in ["prótese", "ortodontia", "odontopediatria", "clínico geral", "cirurgia", "endodontia"]:
+        d["especialidade"] = nova_esp
+    elif nova_esp:
+        print(" Especialidade inválida, mantendo anterior.")
+
+    bairro = input(f"Bairro [{d['bairro']}]: ").strip()
+    if bairro:
+        d["bairro"] = bairro
+
+    entrada_max = input(f"Máximo de pacientes [{d['max_pacientes']}]: ").strip()
+    if entrada_max:
+        try:
+            d["max_pacientes"] = int(entrada_max)
+        except ValueError:
+            print(" Valor inválido, mantendo anterior.")
+
+    salvar_dados()
+    print(f"\n Dentista '{d['nome']}' atualizado com sucesso.\n")
+
+
+def excluir_dentista():
+    """Remove um dentista da lista."""
+    print("\n--- ️ Excluir Dentista ---")
+    if not dentistas:
+        print("Nenhum dentista cadastrado.\n")
+        return
+    listar_dentistas()
+    while True:
+        escolha = obter_inteiro("Número do dentista a excluir (0 para cancelar): ") - 1
+        if escolha == -1:
+            return
+        if 0 <= escolha < len(dentistas):
+            break
+        print(" Número inválido. Tente novamente.")
+
+    nome = dentistas[escolha]["nome"]
+    confirmacao = input(f"Tem certeza que deseja excluir '{nome}'? (s/n): ").strip().lower()
+    if confirmacao == "s":
+        dentistas.pop(escolha)
+        salvar_dados()
+        print(f"\n✅ Dentista '{nome}' excluído com sucesso.\n")
+    else:
+        print(" Exclusão cancelada.\n")
