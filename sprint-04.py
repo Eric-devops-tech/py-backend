@@ -522,3 +522,114 @@ def excluir_consulta():
         print(" Consulta cancelada com sucesso.\n")
     else:
         print(" Cancelamento abortado.\n")
+# MENUS
+
+def menu_pacientes():
+    """Submenu de CRUD para pacientes."""
+    while True:
+        print("\n===  Gerenciar Pacientes ===")
+        print("1. Cadastrar paciente")
+        print("2. Listar pacientes")
+        print("3. Consultar paciente por nome")
+        print("4. Editar paciente")
+        print("5. Excluir paciente")
+        print("0. Voltar ao menu principal")
+        print("-" * 30)
+        opcao = obter_inteiro("Escolha uma opção: ")
+        if opcao == 1:
+            cadastrar_paciente()
+        elif opcao == 2:
+            listar_pacientes()
+        elif opcao == 3:
+            consultar_paciente()
+        elif opcao == 4:
+            editar_paciente()
+        elif opcao == 5:
+            excluir_paciente()
+        elif opcao == 0:
+            break
+        else:
+            print(" Opção inválida.\n")
+
+
+def menu_dentistas():
+    """Submenu de CRUD para dentistas."""
+    while True:
+        print("\n===  Gerenciar Dentistas ===")
+        print("1. Cadastrar dentista")
+        print("2. Listar dentistas")
+        print("3. Consultar dentista")
+        print("4. Editar dentista")
+        print("5. Excluir dentista")
+        print("0. Voltar ao menu principal")
+        print("-" * 30)
+        opcao = obter_inteiro("Escolha uma opção: ")
+        if opcao == 1:
+            cadastrar_dentista()
+        elif opcao == 2:
+            listar_dentistas()
+        elif opcao == 3:
+            consultar_dentista()
+        elif opcao == 4:
+            editar_dentista()
+        elif opcao == 5:
+            excluir_dentista()
+        elif opcao == 0:
+            break
+        else:
+            print(" Opção inválida.\n")
+
+
+def menu_consultas():
+    """Submenu para agendamentos."""
+    while True:
+        print("\n Gerenciar Consultas ")
+        print("1. Agendar consulta")
+        print("2. Listar consultas")
+        print("3. Cancelar consulta")
+        print("0. Voltar ao menu principal")
+        print("-" * 30)
+        opcao = obter_inteiro("Escolha uma opção: ")
+        if opcao == 1:
+            agendar_consulta()
+        elif opcao == 2:
+            listar_consultas()
+        elif opcao == 3:
+            excluir_consulta()
+        elif opcao == 0:
+            break
+        else:
+            print(" Opção inválida.\n")
+
+
+def menu():
+    """Menu principal do sistema."""
+    carregar_dados()
+    while True:
+        print("=" * 40)
+        print("    DENTISTA NA NUVEM — Sprint 3  ")
+        print("=" * 40)
+        print("1.  Gerenciar Pacientes")
+        print("2.   Gerenciar Dentistas")
+        print("3.  Match Paciente ↔ Dentista")
+        print("4.  Gerenciar Consultas")
+        print("0.  Sair")
+        print("-" * 40)
+        opcao = obter_inteiro("Escolha uma opção: ")
+
+        if opcao == 1:
+            menu_pacientes()
+        elif opcao == 2:
+            menu_dentistas()
+        elif opcao == 3:
+            match_paciente_dentista()
+        elif opcao == 4:
+            menu_consultas()
+        elif opcao == 0:
+            print("\nEncerrando... Obrigado por usar o Dentista na Nuvem! \n")
+            break
+        else:
+            print(" Opção inválida. Tente novamente.\n")
+
+# EXECUÇÃO
+menu()
