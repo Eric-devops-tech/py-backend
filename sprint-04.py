@@ -56,15 +56,15 @@ def conectar():
     """Conecta ao banco Oracle."""
     if oracledb is None:
         raise ImportError("Biblioteca 'oracledb' nao instalada. Use: pip install oracledb")
+    
+    oracledb.defaults.thin = True
 
     obter_config_oracle()
-
     return oracledb.connect(
         user=ORACLE_USER,
         password=ORACLE_PASSWORD,
         dsn=ORACLE_DSN,
-        thin=True
-    )
+)
 
 
 def executar_sql(sql, parametros=None, fetch=False, commit=False):
