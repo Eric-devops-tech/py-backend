@@ -30,7 +30,6 @@ TIPOS_DOR_VALIDOS = ["leve", "forte", "dente quebrado"]
 
 
 # CONFIGURACAO DO ORACLE
-# Voce pode preencher por variaveis de ambiente:
 # ORACLE_USER, ORACLE_PASSWORD e ORACLE_DSN.
 # Exemplo de DSN: oracle.fiap.com.br:1521/ORCL
 
@@ -57,7 +56,11 @@ def conectar():
         raise ImportError("Biblioteca 'oracledb' nao instalada. Use: pip install oracledb")
 
     obter_config_oracle()
-    return oracledb.connect(user=ORACLE_USER, password=ORACLE_PASSWORD, dsn=ORACLE_DSN)
+    return oracledb.connect(
+        user="ORACLE_USER",
+        password="ORACLE_PASSWORD",
+        dsn="ORACLE_DSN"
+    )
 
 
 def executar_sql(sql, parametros=None, fetch=False, commit=False):
@@ -459,9 +462,12 @@ def editar_paciente():
     tempo_dor = int(tempo_txt) if tempo_txt.isdigit() else p["tempo_dor"]
 
     renda_txt = input(f"Renda [{p['renda']}]: ").strip().replace(",", ".")
-    try:
-        renda = float(renda_txt) if renda_txt else p["renda"]
-    except ValueError:
+    if not renda_txt:
+     renda = p["renda"]
+    else:
+      try:
+        renda = float(renda_txt)
+      except ValueError:
         print("Renda invalida. Mantendo valor anterior.")
         renda = p["renda"]
 
