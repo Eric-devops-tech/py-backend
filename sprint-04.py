@@ -7,6 +7,8 @@ try:
     import oracledb
 except ImportError:
     oracledb = None
+    if oracledb:
+        oracledb.defaults.thin = True
 
 try:
     import requests
@@ -51,15 +53,17 @@ def obter_config_oracle():
 
 
 def conectar():
-    """Abre uma conexao com o banco Oracle."""
+    """Conecta ao banco Oracle."""
     if oracledb is None:
         raise ImportError("Biblioteca 'oracledb' nao instalada. Use: pip install oracledb")
 
     obter_config_oracle()
+
     return oracledb.connect(
-        user="ORACLE_USER",
-        password="ORACLE_PASSWORD",
-        dsn="ORACLE_DSN"
+        user=ORACLE_USER,
+        password=ORACLE_PASSWORD,
+        dsn=ORACLE_DSN,
+        thin=True
     )
 
 
